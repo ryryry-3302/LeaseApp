@@ -1,4 +1,4 @@
-import { Listing } from "@/types/listing";
+import { Listing, Verification, RunnerReport, TenantReview, Belonging } from "@/types/listing";
 
 // San Francisco neighborhoods popular with interns/students
 const neighborhoods = [
@@ -38,6 +38,13 @@ const descriptions = [
   "Well-maintained unit in historic building. Character and charm with modern amenities.",
 ];
 
+// Use a seeded random number generator for deterministic results
+let seed = 12345;
+function seededRandom() {
+  seed = (seed * 9301 + 49297) % 233280;
+  return seed / 233280;
+}
+
 function randomElement<T>(array: T[]): T {
   return array[Math.floor(seededRandom() * array.length)];
 }
@@ -67,7 +74,7 @@ function generateAddress(neighborhood: string, streetNum: number): string {
 }
 
 function generatePhotos(count: number): string[] {
-  // Using Unsplash API for placeholder images
+  // Using Picsum for placeholder images
   const photos: string[] = [];
   for (let i = 0; i < count; i++) {
     const width = 800;
@@ -90,11 +97,110 @@ function generateDate(daysFromNow: number): string {
   return `${year}-${month}-${day}`;
 }
 
-// Use a seeded random number generator for deterministic results
-let seed = 12345;
-function seededRandom() {
-  seed = (seed * 9301 + 49297) % 233280;
-  return seed / 233280;
+function generateBelongings(count: number): Belonging[] {
+  const categories: Belonging['category'][] = ['Furniture', 'Electronics', 'Appliances', 'Decor', 'Other'];
+  const conditions: Belonging['condition'][] = ['New', 'Like New', 'Good', 'Fair'];
+  const furnitureItems = ['Desk', 'Chair', 'Bed Frame', 'Dresser', 'Bookshelf', 'Coffee Table', 'Dining Table'];
+  const electronics = ['TV', 'Monitor', 'Speakers', 'Router', 'Lamp', 'Fan'];
+  const appliances = ['Microwave', 'Toaster', 'Blender', 'Coffee Maker', 'Air Fryer'];
+  const decor = ['Wall Art', 'Plants', 'Rugs', 'Curtains', 'Mirror', 'Shelves'];
+  const other = ['Storage Bins', 'Hangers', 'Kitchenware Set', 'Bedding Set'];
+
+  const itemPools: { [key: string]: string[] } = {
+    Furniture: furnitureItems,
+    Electronics: electronics,
+    Appliances: appliances,
+    Decor: decor,
+    Other: other,
+  };
+
+  const belongings: Belonging[] = [];
+  for (let i = 0; i < count; i++) {
+    const category = randomElement(categories);
+    const items = itemPools[category];
+    const name = randomElement(items);
+    const condition = randomElement(conditions);
+    const basePrice = category === 'Furniture' ? randomInt(50, 300) : 
+                      category === 'Electronics' ? randomInt(30, 200) :
+                      category === 'Appliances' ? randomInt(20, 150) :
+                      randomInt(10, 100);
+    const price = basePrice + randomInt(-10, 20);
+    
+    belongings.push({
+      id: `belonging-${i + 1}`,
+      name,
+      category,
+      condition,
+      price,
+      negotiable: seededRandom() > 0.5,
+      photos: generatePhotos(1),
+      description: `${condition} condition ${name.toLowerCase()}.`,
+    });
+  }
+  return belongings;
+}
+
+function generateRunnerReport(): RunnerReport {
+  const defects = [
+    'Minor scuff marks on walls',
+    'Small crack in bathroom tile',
+    'Window latch needs repair',
+    'Kitchen faucet drips slightly',
+    'Closet door off track',
+  ];
+  
+  return {
+    propertyCondition: randomInt(3, 5),
+    cleanliness: randomInt(4, 5),
+    defects: defects.slice(0, randomInt(0, 2)),
+    landlordExperience: randomInt(3, 5),
+    photos: generatePhotos(randomInt(2, 4)),
+    notes: 'Property is in good condition overall. Minor wear and tear expected for age. Landlord responsive to maintenance requests.',
+    completedAt: generateDate(-randomInt(1, 30)),
+    runnerName: `Runner ${randomInt(1, 10)}`,
+  };
+}
+
+function generateTenantReview(): TenantReview {
+  const defects = [
+    'Slow drain in bathroom sink',
+    'Window doesn\'t close completely',
+    'Heating takes time to warm up',
+  ];
+  
+  return {
+    landlordRating: randomInt(3, 5),
+    defects: defects.slice(0, randomInt(0, 1)),
+    cleanliness: randomInt(4, 5),
+    recommendation: seededRandom() > 0.3,
+    notes: 'Great location and responsive landlord. Would recommend for students.',
+    submittedAt: generateDate(-randomInt(1, 20)),
+    tenantName: `Tenant ${randomInt(1, 5)}`,
+  };
+}
+
+function generateVerification(index: number): Verification | undefined {
+  // First 7 listings: fully verified
+  if (index < 7) {
+    return {
+      status: 'verified',
+      runnerReport: generateRunnerReport(),
+      tenantReview: generateTenantReview(),
+      verifiedAt: generateDate(-randomInt(5, 15)),
+    };
+  }
+  // Next 4 listings: pending verification
+  else if (index < 11) {
+    return {
+      status: 'pending',
+    };
+  }
+  // Last 4 listings: unverified
+  else {
+    return {
+      status: 'unverified',
+    };
+  }
 }
 
 export function generateMockListings(count: number = 15): Listing[] {
@@ -109,6 +215,9 @@ export function generateMockListings(count: number = 15): Listing[] {
     const price = basePrice + randomInt(-300, 500);
     const availableDays = randomInt(0, 60);
     const leaseDays = randomInt(90, 365);
+
+    const verification = generateVerification(i);
+    const belongings = verification?.status === 'verified' ? generateBelongings(randomInt(3, 8)) : undefined;
 
     const listing: Listing = {
       id: `listing-${i + 1}`,
@@ -136,6 +245,8 @@ export function generateMockListings(count: number = 15): Listing[] {
         phone: `415-${randomInt(100, 999)}-${randomInt(1000, 9999)}`,
       },
       createdAt: now.toISOString(),
+      verification,
+      belongings,
     };
 
     listings.push(listing);
@@ -155,4 +266,5 @@ export const mockListings = (() => {
   }
   return cachedListings;
 })();
+
 

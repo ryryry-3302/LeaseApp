@@ -1,3 +1,51 @@
+export interface ListingFilters {
+  searchQuery?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  availableAfter?: string; // ISO date string
+  verificationStatus?: 'verified' | 'pending' | 'unverified' | 'all';
+}
+
+export interface RunnerReport {
+  propertyCondition: number; // 1-5
+  cleanliness: number; // 1-5
+  defects: string[];
+  landlordExperience: number; // 1-5
+  photos: string[];
+  notes: string;
+  completedAt: string; // ISO date string
+  runnerName?: string;
+}
+
+export interface TenantReview {
+  landlordRating: number; // 1-5
+  defects: string[];
+  cleanliness: number; // 1-5
+  recommendation: boolean;
+  notes: string;
+  submittedAt: string; // ISO date string
+  tenantName?: string;
+}
+
+export interface Verification {
+  status: 'verified' | 'pending' | 'unverified';
+  runnerReport?: RunnerReport;
+  tenantReview?: TenantReview;
+  verifiedAt?: string; // ISO date string
+}
+
+export interface Belonging {
+  id: string;
+  name: string;
+  category: 'Furniture' | 'Electronics' | 'Appliances' | 'Decor' | 'Other';
+  condition: 'New' | 'Like New' | 'Good' | 'Fair';
+  price: number;
+  negotiable: boolean;
+  photos: string[];
+  description?: string;
+}
+
 export interface Listing {
   id: string;
   address: string;
@@ -24,13 +72,8 @@ export interface Listing {
     phone?: string;
   };
   createdAt: string; // ISO date string
+  verification?: Verification;
+  belongings?: Belonging[];
 }
 
-export interface ListingFilters {
-  searchQuery?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  bedrooms?: number;
-  availableAfter?: string; // ISO date string
-}
 
