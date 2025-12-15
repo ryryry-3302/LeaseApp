@@ -1,27 +1,17 @@
 import { Listing, Verification, RunnerReport, TenantReview, Belonging } from "@/types/listing";
 
-// Real San Francisco addresses with geocoded coordinates
-const realAddresses = [
-  { address: "1234 Mission St", neighborhood: "SOMA", lat: 37.7771405, lng: -122.413706, zipCode: "94102" },
-  { address: "567 Market St", neighborhood: "SOMA", lat: 37.7897769, lng: -122.4004917, zipCode: "94102" },
-  { address: "2453 Mission St", neighborhood: "Mission District", lat: 37.7577986, lng: -122.4188696, zipCode: "94110" },
-  { address: "1890 Valencia St", neighborhood: "Mission District", lat: 37.7557022, lng: -122.4210107, zipCode: "94110" },
-  { address: "450 Hayes St", neighborhood: "Hayes Valley", lat: 37.777031, lng: -122.4238821, zipCode: "94102" },
-  { address: "580 Gough St", neighborhood: "Hayes Valley", lat: 37.7785116, lng: -122.4232015, zipCode: "94102" },
-  { address: "1200 California St", neighborhood: "Nob Hill", lat: 37.7916313, lng: -122.4145284, zipCode: "94108" },
-  { address: "950 Mason St", neighborhood: "Nob Hill", lat: 37.79242, lng: -122.4097691, zipCode: "94108" },
-  { address: "2100 Fillmore St", neighborhood: "Pacific Heights", lat: 37.7891589, lng: -122.4336826, zipCode: "94115" },
-  { address: "1800 Jackson St", neighborhood: "Pacific Heights", lat: 37.793788, lng: -122.424864, zipCode: "94115" },
-  { address: "3200 Fillmore St", neighborhood: "Marina", lat: 37.799087, lng: -122.435788, zipCode: "94123" },
-  { address: "2800 Lombard St", neighborhood: "Marina", lat: 37.80152, lng: -122.4242511, zipCode: "94123" },
-  { address: "550 Haight St", neighborhood: "Lower Haight", lat: 37.7720267, lng: -122.4317298, zipCode: "94117" },
-  { address: "800 Fillmore St", neighborhood: "Lower Haight", lat: 37.8015505, lng: -122.4364113, zipCode: "94117" },
-  { address: "185 Berry St", neighborhood: "Mission Bay", lat: 37.7762432, lng: -122.3917021, zipCode: "94107" },
-  { address: "250 King St", neighborhood: "Mission Bay", lat: 37.7780985, lng: -122.3928865, zipCode: "94107" },
-  { address: "1200 18th St", neighborhood: "Potrero Hill", lat: 37.762769, lng: -122.394758, zipCode: "94107" },
-  { address: "800 De Haro St", neighborhood: "Potrero Hill", lat: 37.759605, lng: -122.401204, zipCode: "94107" },
-  { address: "1200 3rd St", neighborhood: "Dogpatch", lat: 37.7737365, lng: -122.3898478, zipCode: "94107" },
-  { address: "900 Tennessee St", neighborhood: "Dogpatch", lat: 37.760306, lng: -122.389578, zipCode: "94107" },
+// San Francisco neighborhoods popular with interns/students
+const neighborhoods = [
+  { name: "SOMA", lat: 37.7749, lng: -122.4194 },
+  { name: "Mission District", lat: 37.7599, lng: -122.4148 },
+  { name: "Hayes Valley", lat: 37.7768, lng: -122.4233 },
+  { name: "Nob Hill", lat: 37.7925, lng: -122.4169 },
+  { name: "Pacific Heights", lat: 37.7925, lng: -122.4396 },
+  { name: "Marina", lat: 37.8024, lng: -122.4488 },
+  { name: "Lower Haight", lat: 37.7719, lng: -122.4312 },
+  { name: "Mission Bay", lat: 37.7706, lng: -122.3892 },
+  { name: "Potrero Hill", lat: 37.7647, lng: -122.4029 },
+  { name: "Dogpatch", lat: 37.7572, lng: -122.3889 },
 ];
 
 const amenities = [
@@ -67,7 +57,21 @@ function randomFloat(min: number, max: number): number {
   return seededRandom() * (max - min) + min;
 }
 
-// generateAddress is no longer needed - we use real addresses
+function generateAddress(neighborhood: string, streetNum: number): string {
+  const streets = [
+    "Mission St",
+    "Market St",
+    "Folsom St",
+    "Harrison St",
+    "Howard St",
+    "Valencia St",
+    "Guerrero St",
+    "Dolores St",
+    "Franklin St",
+    "Gough St",
+  ];
+  return `${streetNum} ${randomElement(streets)}, ${neighborhood}`;
+}
 
 function generatePhotos(count: number): string[] {
   // Using Picsum for placeholder images
@@ -199,23 +203,12 @@ function generateVerification(index: number): Verification | undefined {
   }
 }
 
-export function generateMockListings(count: number = 20): Listing[] {
+export function generateMockListings(count: number = 15): Listing[] {
   const listings: Listing[] = [];
   const now = new Date();
 
-  // Use real addresses - if count exceeds available addresses, cycle through them
   for (let i = 0; i < count; i++) {
-    // Select a real address (ensure we don't reuse if we have enough)
-    let addressIndex: number;
-    if (i < realAddresses.length) {
-      // Use each address once if possible
-      addressIndex = i;
-    } else {
-      // If we need more listings than addresses, randomly select from available
-      addressIndex = Math.floor(seededRandom() * realAddresses.length);
-    }
-    
-    const realAddress = realAddresses[addressIndex];
+    const neighborhood = randomElement(neighborhoods);
     const bedrooms = randomInt(1, 3);
     const bathrooms = bedrooms === 1 ? 1 : randomInt(1, bedrooms);
     const basePrice = bedrooms === 1 ? 2000 : bedrooms === 2 ? 3500 : 5000;
@@ -228,14 +221,14 @@ export function generateMockListings(count: number = 20): Listing[] {
 
     const listing: Listing = {
       id: `listing-${i + 1}`,
-      address: realAddress.address, // Using real geocoded address
-      neighborhood: realAddress.neighborhood,
+      address: generateAddress(neighborhood.name, randomInt(100, 3000)),
+      neighborhood: neighborhood.name,
       city: "San Francisco",
       state: "CA",
-      zipCode: realAddress.zipCode,
+      zipCode: `94${randomInt(100, 999)}`,
       coordinates: {
-        lat: realAddress.lat, // Using real geocoded coordinates
-        lng: realAddress.lng, // Using real geocoded coordinates
+        lat: neighborhood.lat + randomFloat(-0.02, 0.02),
+        lng: neighborhood.lng + randomFloat(-0.02, 0.02),
       },
       price,
       bedrooms,
@@ -266,10 +259,11 @@ export function generateMockListings(count: number = 20): Listing[] {
 let cachedListings: Listing[] | null = null;
 
 export const mockListings = (() => {
-  // Always regenerate to ensure we use the latest real addresses
-  // Reset seed for consistent generation
-  seed = 12345;
-  cachedListings = generateMockListings(20);
+  if (!cachedListings) {
+    // Reset seed for consistent generation
+    seed = 12345;
+    cachedListings = generateMockListings(15);
+  }
   return cachedListings;
 })();
 
