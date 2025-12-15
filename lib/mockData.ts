@@ -70,16 +70,40 @@ function randomFloat(min: number, max: number): number {
 // generateAddress is no longer needed - we use real addresses
 
 function generatePhotos(count: number): string[] {
-  // Using Picsum for placeholder images
+  // Using verified Pexels photo IDs for real apartment/home interiors
+  // All URLs tested and confirmed working - these are actual real estate photos
+  const pexelsPhotos = [
+    'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/1571463/pexels-photo-1571463.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/1571470/pexels-photo-1571470.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/1571472/pexels-photo-1571472.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/1648771/pexels-photo-1648771.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/271743/pexels-photo-271743.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+    'https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+  ];
+  
   const photos: string[] = [];
+  const usedIndices = new Set<number>();
+  
   for (let i = 0; i < count; i++) {
-    const width = 800;
-    const height = 600;
-    const photoSeed = Math.floor(seededRandom() * 1000);
-    photos.push(
-      `https://picsum.photos/seed/apartment${photoSeed}/${width}/${height}`
-    );
+    let photoIndex: number;
+    // Randomly select photos, avoiding duplicates within the same listing
+    if (usedIndices.size < pexelsPhotos.length) {
+      do {
+        photoIndex = Math.floor(seededRandom() * pexelsPhotos.length);
+      } while (usedIndices.has(photoIndex));
+      usedIndices.add(photoIndex);
+    } else {
+      // If we've used all photos, allow reuse but still randomize
+      photoIndex = Math.floor(seededRandom() * pexelsPhotos.length);
+    }
+    photos.push(pexelsPhotos[photoIndex]);
   }
+  
   return photos;
 }
 
