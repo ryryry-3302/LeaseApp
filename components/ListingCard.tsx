@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Listing } from "@/types/listing";
-import { Calendar, MapPin, Bed, Bath } from "lucide-react";
+import { Calendar, Bed, Bath, Heart } from "lucide-react";
 import Link from "next/link";
+import { isListingSaved, toggleSavedListing } from "@/lib/savedListings";
 
 interface ListingCardProps {
   listing: Listing;
@@ -10,6 +12,19 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing, onClick }: ListingCardProps) {
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    setIsSaved(isListingSaved(listing.id));
+  }, [listing.id]);
+
+  const handleSaveClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const nowSaved = toggleSavedListing(listing.id);
+    setIsSaved(nowSaved);
+  };
+
   const formatDate = (dateString: string) => {
     // Parse date string as local date (YYYY-MM-DD) to avoid timezone issues
     const [year, month, day] = dateString.split('-').map(Number);
@@ -37,6 +52,18 @@ export default function ListingCard({ listing, onClick }: ListingCardProps) {
               "https://via.placeholder.com/400x300?text=No+Image";
           }}
         />
+        {/* Save button */}
+        <button
+          onClick={handleSaveClick}
+          className={`absolute top-2 left-2 p-2 rounded-full transition-all ${
+            isSaved 
+              ? "bg-red-500 text-white" 
+              : "bg-white/90 text-gray-600 hover:bg-white hover:text-red-500"
+          }`}
+          aria-label={isSaved ? "Unsave listing" : "Save listing"}
+        >
+          <Heart className={`w-4 h-4 ${isSaved ? "fill-current" : ""}`} />
+        </button>
         <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-sm font-semibold text-gray-800">
           ${listing.price.toLocaleString()}/mo
         </div>
@@ -71,4 +98,3 @@ export default function ListingCard({ listing, onClick }: ListingCardProps) {
     </Link>
   );
 }
-
