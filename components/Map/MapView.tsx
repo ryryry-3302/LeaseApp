@@ -44,9 +44,20 @@ interface MapCenterProps {
 
 function MapCenter({ center, zoom, useMapHook }: MapCenterProps) {
   const map = useMapHook();
+  
   useEffect(() => {
-    if (map) {
-      map.setView(center, zoom);
+    if (map && typeof map.setView === 'function') {
+      try {
+        // Use a small delay to ensure map is fully initialized
+        const timeoutId = setTimeout(() => {
+          if (map && map.getContainer && map.getContainer()) {
+            map.setView(center, zoom);
+          }
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      } catch (error) {
+        console.error("Error setting map view:", error);
+      }
     }
   }, [map, center, zoom]);
   return null;
@@ -72,6 +83,7 @@ export default function MapView({
   useEffect(() => {
     if (typeof window !== 'undefined' && !isClient) {
       // Import CSS first (side effect, doesn't return a module)
+      // @ts-ignore - CSS imports don't have type declarations
       import("leaflet/dist/leaflet.css").then(() => {
         // Then import leaflet and react-leaflet
         return Promise.all([
@@ -142,12 +154,15 @@ export default function MapView({
       zoom={defaultZoom}
       style={{ height: "100%", width: "100%" }}
       className="z-0"
+      key="map-container"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {useMap && <MapCenter center={center} zoom={zoom} useMapHook={useMap} />}
+      {useMap && typeof useMap === 'function' && (
+        <MapCenter center={center} zoom={zoom} useMapHook={useMap} />
+      )}
       {listings.map((listing) => {
         // #region agent log
         if (typeof window !== 'undefined') {

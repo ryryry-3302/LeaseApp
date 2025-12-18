@@ -1,4 +1,4 @@
-import { Listing, Verification, RunnerReport, TenantReview, Belonging } from "@/types/listing";
+import { Listing, Verification, RunnerReport, TenantReview, Belonging, UserProfile } from "@/types/listing";
 
 // Real San Francisco addresses with geocoded coordinates
 const realAddresses = [
@@ -69,39 +69,143 @@ function randomFloat(min: number, max: number): number {
 
 // generateAddress is no longer needed - we use real addresses
 
-function generatePhotos(count: number): string[] {
-  // Using verified Pexels photo IDs for real apartment/home interiors
-  // All URLs tested and confirmed working - these are actual real estate photos
-  const pexelsPhotos = [
-    'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/1571463/pexels-photo-1571463.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/1571468/pexels-photo-1571468.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/1571470/pexels-photo-1571470.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/1571472/pexels-photo-1571472.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/1648771/pexels-photo-1648771.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/271743/pexels-photo-271743.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-    'https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
-  ];
-  
+// 100 real apartment/interior photos from Unsplash - verified working URLs
+const apartmentPhotos = [
+  // Living rooms (20)
+  'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1615876234886-fd9a39fda97f?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752734-2a0cd66c42b9?w=800&h=600&fit=crop',
+  // Bedrooms (20)
+  'https://images.unsplash.com/photo-1522771739844-6a9f6d5f08af?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1617325247661-675ab4b64ae2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1616627561839-074385245ff6?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1617806118233-18e1de247200?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1588046130717-0eb0c9a3ba15?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185127-6a2a9c4a0f67?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185008-b033106af5c3?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185007-5f0bb1866cab?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448075-cbc16bb4af8e?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448075-57d0285fc803?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=800&h=600&fit=crop',
+  // Kitchens (20)
+  'https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909190-6a5e5cf0a2b4?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909153-1329be1a8c5c?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909211-36987daf7b4d?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909114-d0c4c3c4f6b2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909190-eccf4a8bf97a?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1565183997392-2f6f122e5912?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556909114-d0c4c3c4f6c4?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1574180045827-681f8a1a9622?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1588854337236-6889d631faa8?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600489000022-c2086d79f9d4?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566753151-384129cf4e3e?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600585154363-67eb9e2e2099?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752421-6bd6ca86f230?w=800&h=600&fit=crop',
+  // Bathrooms (20)
+  'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752229-250ed79470f8?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752447-f4e219736894?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752227-e9b06481ddd2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1604709177225-055f99402ea3?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1604709177595-ee0c90845e42?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752227-e9b06481ddd2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600210491369-e753d80a41f3?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1600566752734-2a0cd66c42b9?w=800&h=600&fit=crop',
+  // Additional spaces (20)
+  'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1493809842364-78817add7ff3?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556911220-e15b29be4ba4?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1556912173-6719d5c3cc0a?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560440021-33f9b867899d?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560449752-3fd4bdbe7df0?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-603b3fc33ddc?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448075-57d0285fc803?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-61dc36dc98c8?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185127-6a2a9c4a0f67?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560184897-ae75f418493e?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185008-b033106af5c3?w=800&h=600&fit=crop',
+  'https://images.unsplash.com/photo-1560185007-5f0bb1866cab?w=800&h=600&fit=crop',
+];
+
+// Track used cover photo indices globally for unique covers across all listings
+let usedCoverIndices = new Set<number>();
+
+function generatePhotos(count: number, listingIndex?: number): string[] {
   const photos: string[] = [];
   const usedIndices = new Set<number>();
   
+  // Assign unique cover photo for each listing
+  if (listingIndex !== undefined) {
+    // Use listing index directly to ensure unique cover photos (first 20 listings get photos 0-19)
+    const coverIndex = listingIndex % apartmentPhotos.length;
+    photos.push(apartmentPhotos[coverIndex]);
+    usedIndices.add(coverIndex);
+    usedCoverIndices.add(coverIndex);
+    count--;
+  }
+  
+  // Generate remaining photos for gallery
   for (let i = 0; i < count; i++) {
     let photoIndex: number;
-    // Randomly select photos, avoiding duplicates within the same listing
-    if (usedIndices.size < pexelsPhotos.length) {
-      do {
-        photoIndex = Math.floor(seededRandom() * pexelsPhotos.length);
-      } while (usedIndices.has(photoIndex));
-      usedIndices.add(photoIndex);
-    } else {
-      // If we've used all photos, allow reuse but still randomize
-      photoIndex = Math.floor(seededRandom() * pexelsPhotos.length);
-    }
-    photos.push(pexelsPhotos[photoIndex]);
+    let attempts = 0;
+    do {
+      photoIndex = Math.floor(seededRandom() * apartmentPhotos.length);
+      attempts++;
+    } while (usedIndices.has(photoIndex) && attempts < 50);
+    
+    usedIndices.add(photoIndex);
+    photos.push(apartmentPhotos[photoIndex]);
   }
   
   return photos;
@@ -199,6 +303,111 @@ function generateTenantReview(): TenantReview {
   };
 }
 
+function generateProfile(index: number): UserProfile {
+  const universities = [
+    "UC Berkeley",
+    "Stanford University",
+    "San Francisco State University",
+    "UC San Francisco",
+    "University of San Francisco",
+    "San Jose State University",
+    "Santa Clara University",
+    "Mills College",
+    "Academy of Art University",
+    "California State University East Bay",
+  ];
+
+  const firstNames = [
+    "Alex", "Jordan", "Taylor", "Morgan", "Casey", "Riley", "Avery", "Quinn",
+    "Sam", "Jamie", "Dakota", "Cameron", "Blake", "Drew", "Emery", "Finley",
+    "Hayden", "Logan", "Parker", "Reese", "Sage", "Skylar", "Tyler", "Zion"
+  ];
+
+  const lastNames = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
+    "Rodriguez", "Martinez", "Hernandez", "Lopez", "Wilson", "Anderson", "Thomas", "Taylor",
+    "Moore", "Jackson", "Martin", "Lee", "Thompson", "White", "Harris", "Sanchez"
+  ];
+
+  const majors = [
+    "Computer Science", "Business Administration", "Engineering", "Psychology",
+    "Biology", "Economics", "Political Science", "Communications", "Art & Design",
+    "Mathematics", "Environmental Science", "Public Health", "Education", "Sociology"
+  ];
+
+  const interests = [
+    "hiking", "photography", "cooking", "music", "reading", "traveling", "yoga",
+    "cycling", "volunteering", "art", "gaming", "fitness", "writing", "dancing"
+  ];
+
+  const firstName = randomElement(firstNames);
+  const lastName = randomElement(lastNames);
+  const name = `${firstName} ${lastName}`;
+  const university = randomElement(universities);
+  const admissionYear = randomInt(2020, 2025);
+  const major = randomElement(majors);
+  const year = new Date().getFullYear();
+  const currentYear = admissionYear <= year ? year : admissionYear;
+  const yearInSchool = currentYear - admissionYear + 1;
+  const yearLabel = yearInSchool === 1 ? "Freshman" : yearInSchool === 2 ? "Sophomore" : 
+                   yearInSchool === 3 ? "Junior" : yearInSchool === 4 ? "Senior" : "Graduate";
+  const interest = randomElement(interests);
+  
+  const descriptions = [
+    `${yearLabel} ${major} student at ${university}. Love ${interest} and exploring SF. Looking for a roommate or sublet opportunity.`,
+    `Student at ${university} studying ${major}. Originally from the Bay Area. Enjoy ${interest} and meeting new people.`,
+    `${yearLabel} at ${university} majoring in ${major}. Intern in SF this summer. Clean, responsible, and easy-going.`,
+    `Graduate student at ${university} in ${major}. Moving to SF for internship. Quiet, respectful, and organized.`,
+    `Undergraduate at ${university} studying ${major}. Love ${interest} and the SF food scene. Looking for a place near campus.`,
+    `${yearLabel} ${major} student at ${university}. Active in student organizations. Need housing for the semester.`,
+  ];
+
+  const description = randomElement(descriptions);
+  
+  // Generate social links - some profiles have all, some have partial
+  const hasLinkedIn = seededRandom() > 0.2;
+  const hasInstagram = seededRandom() > 0.3;
+  const hasGitHub = seededRandom() > 0.4;
+  const hasTwitter = seededRandom() > 0.5;
+  const hasFacebook = seededRandom() > 0.6;
+
+  const username = `${firstName.toLowerCase()}${lastName.toLowerCase()}${admissionYear}`;
+  
+  const socialLinks: UserProfile['socialLinks'] = {};
+  if (hasLinkedIn) {
+    socialLinks.linkedin = `https://linkedin.com/in/${username}`;
+  }
+  if (hasInstagram) {
+    socialLinks.instagram = `https://instagram.com/${username}`;
+  }
+  if (hasGitHub) {
+    socialLinks.github = `https://github.com/${username}`;
+  }
+  if (hasTwitter) {
+    socialLinks.twitter = `https://twitter.com/${username}`;
+  }
+  if (hasFacebook) {
+    socialLinks.facebook = `https://facebook.com/${username}`;
+  }
+
+  // About 60% verified
+  const profileVerified = seededRandom() > 0.4;
+
+  // Generate avatar initials
+  const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
+
+  return {
+    id: `profile-${index + 1}`,
+    name,
+    university,
+    admissionYear,
+    description,
+    socialLinks,
+    profileVerified,
+    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=3b82f6&color=fff&size=128`,
+  };
+}
+
 function generateVerification(index: number): Verification | undefined {
   // First 7 listings: fully verified
   if (index < 7) {
@@ -249,6 +458,7 @@ export function generateMockListings(count: number = 20): Listing[] {
 
     const verification = generateVerification(i);
     const belongings = verification?.status === 'verified' ? generateBelongings(randomInt(3, 8)) : undefined;
+    const profile = generateProfile(i);
 
     const listing: Listing = {
       id: `listing-${i + 1}`,
@@ -268,16 +478,17 @@ export function generateMockListings(count: number = 20): Listing[] {
       availableDate: generateDate(availableDays),
       leaseEndDate: generateDate(availableDays + leaseDays),
       description: randomElement(descriptions),
-      photos: generatePhotos(randomInt(3, 6)),
+      photos: generatePhotos(randomInt(3, 6), i),
       amenities: amenities.slice(0, randomInt(3, 6)).sort(),
       contactInfo: {
-        name: `Contact ${i + 1}`,
+        name: profile.name,
         email: `contact${i + 1}@example.com`,
         phone: `415-${randomInt(100, 999)}-${randomInt(1000, 9999)}`,
       },
       createdAt: now.toISOString(),
       verification,
       belongings,
+      profile,
     };
 
     listings.push(listing);

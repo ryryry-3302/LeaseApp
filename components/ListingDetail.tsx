@@ -4,6 +4,7 @@ import { Listing } from "@/types/listing";
 import { Calendar, MapPin, Bed, Bath, Square, ArrowLeft, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import ProfileCard from "./ProfileCard";
 
 interface ListingDetailProps {
   listing: Listing;
@@ -170,6 +171,14 @@ export default function ListingDetail({ listing }: ListingDetailProps) {
               </div>
             </div>
           </div>
+
+          {/* Profile Section */}
+          {listing.profile && (
+            <div className="mb-6 border-t pt-6">
+              <h2 className="text-2xl font-semibold mb-4">Posted By</h2>
+              <ProfileCard profile={listing.profile} mode="inline" showFullDescription={false} />
+            </div>
+          )}
 
           {/* Contact Section */}
           <div className="border-t pt-6">

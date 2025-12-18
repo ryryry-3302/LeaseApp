@@ -74,6 +74,24 @@ export interface Listing {
   createdAt: string; // ISO date string
   verification?: Verification;
   belongings?: Belonging[];
+  profile?: UserProfile;
 }
 
 
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  university: string;
+  admissionYear: number;
+  description: string;
+  socialLinks: {
+    linkedin?: string;
+    instagram?: string;
+    github?: string;
+    twitter?: string;
+    facebook?: string;
+  };
+  profileVerified: boolean;
+  avatar?: string;
+}

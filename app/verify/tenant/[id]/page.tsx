@@ -37,7 +37,7 @@ export default function TenantReviewPage() {
       alert("Please complete all required fields");
       return;
     }
-    alert("Review submitted! You'll earn $20 if this listing is successfully rented through Leasy.");
+    alert("Review submitted! You&apos;ll earn $20 if this listing is successfully rented through Leasy.");
     router.push(`/listing/${listingId}`);
   };
 
@@ -73,7 +73,7 @@ export default function TenantReviewPage() {
             <p className="text-gray-600 mb-2">Property: {listing.address}</p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
               <p className="text-sm text-green-800">
-                <strong>Earn $20!</strong> You'll receive $20 if your lease is successfully taken over through Leasy.
+                <strong>Earn $20!</strong> You&apos;ll receive $20 if your lease is successfully taken over through Leasy.
               </p>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function TenantReviewPage() {
             {/* Defects */}
             <section>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Issues / Defects You've Experienced
+                Issues / Defects You&apos;ve Experienced
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {defectOptions.map((defect) => (

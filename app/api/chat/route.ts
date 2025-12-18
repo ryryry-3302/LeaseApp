@@ -65,12 +65,14 @@ function filterListings(requirements: {
     filtered = filtered.filter((l) => l.bedrooms === requirements.bedrooms);
   }
 
-  if (requirements.maxPrice !== undefined && requirements.maxPrice !== null) {
-    filtered = filtered.filter((l) => l.price <= requirements.maxPrice);
+  if (typeof requirements.maxPrice === 'number') {
+    const maxPrice = requirements.maxPrice;
+    filtered = filtered.filter((l) => l.price <= maxPrice);
   }
 
-  if (requirements.minPrice !== undefined && requirements.minPrice !== null) {
-    filtered = filtered.filter((l) => l.price >= requirements.minPrice);
+  if (typeof requirements.minPrice === 'number') {
+    const minPrice = requirements.minPrice;
+    filtered = filtered.filter((l) => l.price >= minPrice);
   }
 
   if (requirements.neighborhoods && requirements.neighborhoods.length > 0) {
